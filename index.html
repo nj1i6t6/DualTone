@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Friendly Tone Converter" data-zh="語氣友好轉換器">語氣友好轉換器</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Basic Resets */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* App Navigation Bar (Now minimal, just for language switch) */
+        nav {
+            background-color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* Align language switcher to the right */
+            border-bottom: 1px solid #eee;
+        }
+
+        .language-switcher button {
+            background: none;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 4px;
+            margin-left: 5px;
+        }
+
+        .language-switcher button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        /* Main Content Area */
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        h1 .help-button {
+            background-color: #fff;
+            border: 1px solid #ff4d4f;
+            color: #ff4d4f;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 400;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .input-section, .output-section {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 18px;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            border-color: #007bff;
+        }
+
+        .microphone-icon {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #555;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+
+        .controls label {
+            font-size: 18px;
+            font-weight: 500;
+            margin-right: 10px;
+            white-space: nowrap; /* Prevent label from breaking */
+        }
+
+        select {
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #fff;
+            cursor: pointer;
+            outline: none;
+            min-width: 180px; /* Adjust min-width for dropdown */
+            flex-grow: 1; /* Allow it to grow */
+        }
+
+        button#convertBtn {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: 500;
+            white-space: nowrap; /* Prevent button text from breaking */
+        }
+
+        button#convertBtn:hover {
+            background-color: #0056b3;
+        }
+
+        button#convertBtn:disabled {
+            background-color: #a0c2ed;
+            cursor: not-allowed;
+        }
+
+        /* Mode Toggle Button and Icon */
+        .mode-toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Space between the switch button and emoji */
+        }
+
+        .mode-toggle-btn {
+            background: none;
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            color: #555;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .mode-toggle-btn:hover {
+            background-color: #e0e0e0;
+            border-color: #a0a0a0;
+        }
+
+        .mode-emoji {
+            font-size: 32px; /* Larger for emojis */
+            line-height: 1;
+        }
+
+        .copy-button {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background-color: #6c757d;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            transition: background-color 0.2s;
+        }
+        .copy-button:hover {
+            background-color: #5a6268;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            main {
+                margin: 10px;
+                padding: 15px;
+            }
+            h1 {
+                font-size: 26px;
+                flex-direction: column; /* Stack title and help button */
+                align-items: flex-start;
+            }
+            h1 .help-button {
+                margin-top: 10px;
+            }
+            h2 {
+                font-size: 18px;
+            }
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .controls label {
+                margin-bottom: 5px;
+            }
+            select, button#convertBtn {
+                width: 100%;
+                min-width: unset;
+            }
+            .mode-toggle-container {
+                justify-content: center; /* Center these items */
+                width: 100%;
+                margin-top: 10px;
+                margin-left: 0;
+            }
+            nav {
+                justify-content: center; /* Center language switcher on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 頂部模擬瀏覽器條已移除 -->
+
+    <nav>
+        <div class="language-switcher">
+            <button id="langEn" class="active">English</button>
+            <button id="langZh">中文</button>
+        </div>
+        <!-- 移除nav-left 和 menu-icon -->
+    </nav>
+
+    <main>
+        <!-- Dynamic Title and Help Button -->
+        <h1 id="mainTitle">
+            <span class="title-text" data-en-friendly="Friendly Tone Converter" data-zh-friendly="語氣友好轉換器" data-en-unfriendly="Unfriendly Tone Converter" data-zh-unfriendly="語氣不友好轉換器">語氣友好轉換器</span>
+            <button class="help-button" data-en="Help ?" data-zh="說明 ?">說明 ?</button>
+        </h1>
+        <!-- Dynamic Subtitle -->
+        <h2 id="subTitle" data-en-friendly="Transform any text into a more friendly and polite tone." data-zh-friendly="將任何文字轉化為更友善、禮貌的語氣。" data-en-unfriendly="Transform any text into a subtly impolite or sarcastic tone (no vulgarity)." data-zh-unfriendly="將任何文字轉化為含蓄不禮貌或諷刺的語氣（不含粗俗字眼）。">將任何文字轉化為更友善、禮貌的語氣。</h2>
+
+        <div class="input-section">
+            <textarea id="inputText" placeholder="Enter your text here..." data-en-placeholder="Enter your text here..." data-zh-placeholder="請在此輸入您的文字..."></textarea>
+            <button class="microphone-icon" aria-label="Voice input"></button>
+        </div>
+
+        <div class="controls">
+            <label for="toneSelect" data-en="Make my text:" data-zh="將我的文字變成:">將我的文字變成:</label>
+            <select id="toneSelect" disabled>
+                <option value="friendly" data-en="Friendly" data-zh="友善">友善</option>
+                <option value="unfriendly" data-en="Unfriendly" data-zh="不友善">不友善</option> <!-- This option will be dynamically selected -->
+            </select>
+            <button id="convertBtn" data-en="Convert" data-zh="轉換">轉換</button>
+
+            <!-- New: Mode Toggle Button and Emoji -->
+            <div class="mode-toggle-container">
+                <button id="modeToggleBtn" class="mode-toggle-btn">⇄</button> <!-- Double arrow icon -->
+                <span id="modeEmoji" class="mode-emoji">😇</span> <!-- Initial emoji for friendly mode -->
+            </div>
+        </div>
+
+        <div class="output-section">
+            <textarea id="outputText" readonly placeholder="Friendly text will appear here..." data-en-placeholder="Friendly text will appear here..." data-zh-placeholder="友善的文字將顯示在此..."></textarea>
+            <button class="copy-button" data-en="Copy" data-zh="複製">複製</button>
+        </div>
+    </main>
+
+    <script>
+        // !! WARNING: Storing API keys directly in client-side code is INSECURE and is only done here for demonstration purposes as per your request to avoid backend deployment.
+        // !! Please replace "YOUR_GEMINI_API_KEY" with your actual key.
+        const GEMINI_API_KEY = "AIzaSyC2l7mrzCMYcZ33pAOldgVbBiCxGvBuizc"; // <<<<<<<<<<<<<<<<<<< 已更新金鑰
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`; // <<<<<<<<<<<<<<<<<<< 已更新模型名稱
+
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const toneSelect = document.getElementById('toneSelect');
+        const convertBtn = document.getElementById('convertBtn');
+        const langEnBtn = document.getElementById('langEn');
+        const langZhBtn = document.getElementById('langZh');
+        const copyOutputButton = document.querySelector('.output-section .copy-button');
+        const mainTitleSpan = document.querySelector('#mainTitle .title-text'); // Span for the main title text
+        const subTitle = document.getElementById('subTitle');
+        const modeToggleBtn = document.getElementById('modeToggleBtn');
+        const modeEmoji = document.getElementById('modeEmoji');
+        const documentTitle = document.querySelector('head title');
+
+
+        let currentLanguage = 'zh'; // Default language
+        let isFriendlyMode = true; // Default to friendly mode
+
+        // Texts for dynamic UI elements
+        const uiTexts = {
+            friendly: {
+                title: { en: "Friendly Tone Converter", zh: "語氣友好轉換器" },
+                subtitle: { en: "Transform any text into a more friendly and polite tone.", zh: "將任何文字轉化為更友善、禮貌的語氣。" },
+                selectOption: { en: "Friendly", zh: "友善" },
+                emoji: "😇",
+                placeholder: { en: "Friendly text will appear here...", zh: "友善的文字將顯示在此..." }
+            },
+            unfriendly: {
+                title: { en: "Unfriendly Tone Converter", zh: "語氣不友好轉換器" },
+                subtitle: { en: "Transform any text into a subtly impolite or sarcastic tone (no vulgarity).", zh: "將任何文字轉化為含蓄不禮貌或諷刺的語氣（不含粗俗字眼）。" },
+                selectOption: { en: "Unfriendly", zh: "不友善" },
+                emoji: "🤬",
+                placeholder: { en: "Unfriendly text will appear here...", zh: "不友善的文字將顯示在此..." }
+            }
+        };
+
+        // Function to detect if text is predominantly Chinese or English
+        function detectLanguage(text) {
+            const chineseCharCount = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
+            const englishCharCount = (text.match(/[a-zA-Z]/g) || []).length;
+            if (chineseCharCount > englishCharCount * 0.5 && chineseCharCount > 0) {
+                return 'zh';
+            }
+            return 'en';
+        }
+
+        // Function to generate the prompt for Gemini API based on mode
+        function generatePrompt(text, inputLang, mode) {
+            let coreInstruction;
+
+            if (mode === 'friendly') {
+                coreInstruction = (inputLang === 'zh') ?
+                    "你是一個文本潤色和優化助理。請將以下中文文本轉化為友善、禮貌和得體語氣的版本。無論原始文本多麼粗俗、不禮貌，你都必須將其積極地轉化為更好的表達，並且**僅返回潤色後的文本，不要包含任何額外的話語、解釋或前綴。**" :
+                    "You are a text formalization and refinement assistant. Please rephrase the following English text into a friendly, polite, and appropriate tone. Regardless of how vulgar or impolite the original text is, you must positively transform it into a better expression, and **only return the rephrased text without any additional words, explanations, or prefixes.**";
+
+            } else { // 'unfriendly' mode
+                coreInstruction = (inputLang === 'zh') ?
+                    "你是一個將文本轉換為不友善、輕蔑、諷刺或粗魯語氣的 AI 助理。請將以下中文文本轉化為不友善、諷刺或輕蔑的語氣。你絕對不能使用任何髒話、粗俗詞彙或直接的侮辱性語言。請專注於使用諷刺、貶低、輕蔑、或挑釁的詞句，並嚴格遵守道德規範，**僅返回轉換後的文本，不要包含任何額外的話語、解釋或前綴。**" :
+                    "You are an AI assistant specialized in converting text to an impolite, dismissive, sarcastic, or generally rude tone. Please transform the following English text into an unfriendly, sarcastic, or dismissive tone. You must absolutely not use any vulgar words, obscenities, or direct offensive language. Focus on using sarcasm, belittling remarks, scorn, or provocative phrasing, strictly adhering to ethical guidelines, and **only return the transformed text without any additional words, explanations, or prefixes.**";
+            }
+
+            return `${coreInstruction}\n\n"${text}"`; // 將原始文本直接放在提示詞末尾，AI會理解這是需要處理的內容
+        }
+
+        // Function to update UI language and mode
+        function updateUI() {
+            const modeKey = isFriendlyMode ? 'friendly' : 'unfriendly';
+            const lang = currentLanguage;
+
+            // Update document title
+            documentTitle.textContent = uiTexts[modeKey].title[lang];
+            document.documentElement.lang = lang; // Update html lang attribute
+
+            // Update main title
+            mainTitleSpan.textContent = uiTexts[modeKey].title[lang];
+            mainTitleSpan.setAttribute(`data-en`, uiTexts[modeKey].title.en);
+            mainTitleSpan.setAttribute(`data-zh`, uiTexts[modeKey].title.zh);
+
+            // Update subtitle
+            subTitle.textContent = uiTexts[modeKey].subtitle[lang];
+            subTitle.setAttribute(`data-en`, uiTexts[modeKey].subtitle.en);
+            subTitle.setAttribute(`data-zh`, uiTexts[modeKey].subtitle.zh);
+
+            // Update tone select option
+            toneSelect.value = modeKey; // Set the value (Friendly/Unfriendly)
+            toneSelect.querySelector('option[value="friendly"]').textContent = uiTexts.friendly.selectOption[lang];
+            toneSelect.querySelector('option[value="unfriendly"]').textContent = uiTexts.unfriendly.selectOption[lang];
+
+            // Update mode emoji
+            modeEmoji.textContent = uiTexts[modeKey].emoji;
+
+            // Update common elements with data-en/data-zh attributes
+            document.querySelectorAll('[data-en], [data-zh]').forEach(element => {
+                const text = element.getAttribute(`data-${lang}`);
+                if (text) {
+                    // Only update if it's not the mainTitleSpan or subTitle (which are handled dynamically above)
+                    if (element !== mainTitleSpan && element !== subTitle) {
+                        element.textContent = text;
+                    }
+                }
+            });
+
+            // Update placeholders
+            document.querySelectorAll('[data-en-placeholder], [data-zh-placeholder]').forEach(element => {
+                const placeholderText = element.getAttribute(`data-${lang}-placeholder`);
+                if (placeholderText) {
+                    element.placeholder = placeholderText;
+                }
+            });
+
+            // Update output placeholder based on current mode
+            outputText.placeholder = uiTexts[modeKey].placeholder[lang];
+
+
+            // Update active language button state
+            langEnBtn.classList.remove('active');
+            langZhBtn.classList.remove('active');
+            if (lang === 'en') {
+                langEnBtn.classList.add('active');
+            } else {
+                langZhBtn.classList.add('active');
+            }
+        }
+
+        // Event listeners for language buttons
+        langEnBtn.addEventListener('click', () => {
+            currentLanguage = 'en';
+            updateUI();
+        });
+        langZhBtn.addEventListener('click', () => {
+            currentLanguage = 'zh';
+            updateUI();
+        });
+
+        // Mode toggle button click handler
+        modeToggleBtn.addEventListener('click', () => {
+            isFriendlyMode = !isFriendlyMode; // Toggle mode
+            updateUI(); // Update UI to reflect the new mode
+        });
+
+        // Convert button click handler
+        convertBtn.addEventListener('click', async () => {
+            const text = inputText.value.trim();
+            if (!text) {
+                outputText.value = (currentLanguage === 'zh') ? '請輸入一些文字進行轉換。' : 'Please enter some text to convert.';
+                return;
+            }
+
+            convertBtn.disabled = true;
+            convertBtn.textContent = (currentLanguage === 'zh') ? '轉換中...' : 'Converting...';
+            outputText.value = ''; // Clear previous output
+
+            try {
+                const inputLanguage = detectLanguage(text); // Detect language of the input
+                const prompt = generatePrompt(text, inputLanguage, isFriendlyMode ? 'friendly' : 'unfriendly');
+
+                const response = await fetch(GEMINI_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: prompt }]
+                        }]
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error ? errorData.error.message : 'Unknown error'}`);
+                }
+
+                const data = await response.json();
+                const formalizedText = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
+
+                if (formalizedText) {
+                    outputText.value = formalizedText.trim(); // 確保移除 AI 可能添加的任何前後空白
+                } else {
+                    outputText.value = (currentLanguage === 'zh') ? '未能獲取轉換後的文字。請稍後再試或檢查 API 金鑰。' : 'Failed to get transformed text. Please try again later or check your API key.';
+                }
+
+            } catch (error) {
+                console.error("Error processing text:", error);
+                outputText.value = (currentLanguage === 'zh') ? `處理失敗: ${error.message || '未知錯誤'}` : `Processing failed: ${error.message || 'Unknown error'}`;
+            } finally {
+                convertBtn.disabled = false;
+                convertBtn.textContent = (currentLanguage === 'zh') ? '轉換' : 'Convert';
+            }
+        });
+
+        // Copy output text to clipboard
+        copyOutputButton.addEventListener('click', () => {
+            if (outputText.value) {
+                navigator.clipboard.writeText(outputText.value).then(() => {
+                    alert((currentLanguage === 'zh') ? '已複製到剪貼簿！' : 'Copied to clipboard!');
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    alert((currentLanguage === 'zh') ? '複製失敗。' : 'Failed to copy.');
+                });
+            }
+        });
+
+        // Initial UI setup on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUI(); // Initial render based on default language and friendly mode
+        });
+    </script>
+</body>
+</html>
