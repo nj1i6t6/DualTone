@@ -304,8 +304,8 @@
     <script>
         // !! WARNING: Storing API keys directly in client-side code is INSECURE and is only done here for demonstration purposes as per your request to avoid backend deployment.
         // !! Please replace "YOUR_GEMINI_API_KEY" with your actual key.
-        const GEMINI_API_KEY = "AIzaSyC2l7mrzCMYcZ33pAOldgVbBiCxGvBuizc"; // <<<<<<<<<<<<<<<<<<< 已更新金鑰
-        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`; // <<<<<<<<<<<<<<<<<<< 已更新模型名稱
+        const GEMINI_API_KEY = "AIzaSyC2l7mrzCMYcZ33pAOldgVbBiCxGvBuizc";
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
 
         const inputText = document.getElementById('inputText');
         const outputText = document.getElementById('outputText');
@@ -358,13 +358,13 @@
 
             if (mode === 'friendly') {
                 coreInstruction = (inputLang === 'zh') ?
-                    "你是一個文本潤色和優化助理。請將以下中文文本轉化為友善、禮貌和得體語氣的版本。無論原始文本多麼粗俗、不禮貌，你都必須將其積極地轉化為更好的表達，並且**僅返回潤色後的文本，不要包含任何額外的話語、解釋或前綴。**" :
-                    "You are a text formalization and refinement assistant. Please rephrase the following English text into a friendly, polite, and appropriate tone. Regardless of how vulgar or impolite the original text is, you must positively transform it into a better expression, and **only return the rephrased text without any additional words, explanations, or prefixes.**";
+                    "你是一個文本語氣轉換器。請將以下中文文本改寫為**完全友善、禮貌和得體**的語氣。請**只返回改寫後的文本，不要包含任何多餘的引言、解釋、評論，或直接回應用戶。你的目標是將原始文本的**內容和語氣**直接轉換為友善版本，而非對話式回覆。**" :
+                    "You are a text tone converter. Please rewrite the following English text into a **completely friendly, polite, and appropriate** tone. Please **only return the rewritten text, without any additional preambles, explanations, comments, or direct responses to the user. Your goal is to directly transform the original text's content and tone into a friendly version, not a conversational reply.**";
 
             } else { // 'unfriendly' mode
                 coreInstruction = (inputLang === 'zh') ?
-                    "你是一個將文本轉換為不友善、輕蔑、諷刺或粗魯語氣的 AI 助理。請將以下中文文本轉化為不友善、諷刺或輕蔑的語氣。你絕對不能使用任何髒話、粗俗詞彙或直接的侮辱性語言。請專注於使用諷刺、貶低、輕蔑、或挑釁的詞句，並嚴格遵守道德規範，**僅返回轉換後的文本，不要包含任何額外的話語、解釋或前綴。**" :
-                    "You are an AI assistant specialized in converting text to an impolite, dismissive, sarcastic, or generally rude tone. Please transform the following English text into an unfriendly, sarcastic, or dismissive tone. You must absolutely not use any vulgar words, obscenities, or direct offensive language. Focus on using sarcasm, belittling remarks, scorn, or provocative phrasing, strictly adhering to ethical guidelines, and **only return the transformed text without any additional words, explanations, or prefixes.**";
+                    "你是一個將文本轉換為不友善、輕蔑、諷刺或粗魯語氣的 AI 助理。請將以下中文文本轉化為不友善、諷刺或輕蔑的語氣。你絕對不能使用任何髒話、粗俗詞彙或直接的侮辱性語言。請專注於使用諷刺、貶低、輕蔑、或挑釁的詞句，**並可適當加入不帶髒字的俚語或口語化表達**，但仍需嚴格遵守道德規範，**僅返回轉換後的文本，不要包含任何額外的話語、解釋或前綴。**" :
+                    "You are an AI assistant specialized in converting text to an impolite, dismissive, sarcastic, or generally rude tone. Please transform the following English text into an unfriendly, sarcastic, or dismissive tone. You must absolutely not use any vulgar words, obscenities, or direct offensive language. Focus on using sarcasm, belittling remarks, scorn, or provocative phrasing, **and may appropriately incorporate non-vulgar slang or colloquialisms**, but strictly adhere to ethical guidelines, and **only return the transformed text without any additional words, explanations, or prefixes.**";
             }
 
             return `${coreInstruction}\n\n"${text}"`; // 將原始文本直接放在提示詞末尾，AI會理解這是需要處理的內容
