@@ -40,7 +40,7 @@
             border-radius: 4px;
             margin-left: 5px;
         }
-        /* MODIFIED: Added disabled styles for various elements */
+        
         .language-switcher button:disabled,
         #modeToggleBtn:disabled,
         #toneSelect:disabled,
@@ -139,7 +139,7 @@
             margin-bottom: 25px;
             gap: 15px;
             flex-wrap: wrap;
-            position: relative; /* For loader */
+            position: relative; 
         }
 
         .controls label {
@@ -172,7 +172,7 @@
             transition: background-color 0.2s;
             font-weight: 500;
             white-space: nowrap;
-            position: relative; /* For loader text */
+            position: relative; 
         }
 
         button#convertBtn:hover {
@@ -210,7 +210,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-left: auto; /* MODIFIED: To push to the right if select is active */
+            margin-left: auto; 
         }
 
         .mode-toggle-btn {
@@ -325,7 +325,7 @@
             font-size: 14px; 
             margin-bottom: 8px;
         }
-        /* MODIFIED: Style for scroll notice at the top of terms */
+        
         .disclaimer-terms .scroll-notice-top {
             font-style: italic;
             color: #777;
@@ -375,10 +375,10 @@
                 min-width: unset;
             }
             .mode-toggle-container {
-                /* MODIFIED: No longer centered, will flow with other controls or float right */
+                
                 width: auto; 
                 margin-top: 10px;
-                margin-left: 0; /* Reset if it was auto before for flex-end */
+                margin-left: 0; 
             }
             nav {
                 justify-content: center;
@@ -412,15 +412,15 @@
         <h2 id="subTitle" data-en-friendly="Transform any text into a more friendly and polite tone." data-zh-friendly="將任何文字轉化為更友善、禮貌的語氣。" data-en-unfriendly="Rewrite any text into an extremely vulgar, discriminatory, and violent tone. Use with extreme caution." data-zh-unfriendly="將任何文字改寫為極度粗俗、歧視、暴力的語氣。請極度謹慎使用。">將任何文字轉化為更友善、禮貌的語氣。</h2>
 
         <div class="input-section">
-            <!-- MODIFIED: Removed static maxlength, will be set by JS -->
+            
             <textarea id="inputText" placeholder="Enter your text here..." data-en-placeholder="Enter your text here..." data-zh-placeholder="請在此輸入您的文字..."></textarea>
-            <!-- MODIFIED: Added ID to microphone button -->
+            
             <button id="microphoneBtn" class="microphone-icon" aria-label="Voice input"></button>
         </div>
 
         <div class="controls">
             <label for="toneSelect" data-en="Rewrite my text to be:" data-zh="將我的文字改寫成:">將我的文字改寫成:</label>
-            <!-- MODIFIED: Removed 'disabled' from select -->
+            
             <select id="toneSelect">
                 <option value="friendly" data-en="Friendly" data-zh="友善">友善</option>
                 <option value="unfriendly" data-en="Aggressive & Offensive" data-zh="攻擊性與冒犯性">攻擊性與冒犯性</option>
@@ -440,7 +440,7 @@
 
         <div class="output-section">
             <textarea id="outputText" readonly placeholder="Rewritten text will appear here..." data-en-placeholder="Rewritten text will appear here..." data-zh-placeholder="改寫後的文字將顯示在此..."></textarea>
-            <!-- MODIFIED: Added ID to copy button -->
+            
             <button id="copyOutputBtn" class="copy-button" data-en="Copy" data-zh="複製">複製</button>
         </div>
     </main>
@@ -459,14 +459,14 @@
         <div class="modal-content">
             <h3 id="disclaimerModalTitle"></h3>
             <div id="disclaimerTerms" class="disclaimer-terms">
-                <!-- MODIFIED: Moved scrollNotice to the top and gave it an ID -->
+                
                 <p id="disclaimerScrollNotice" class="scroll-notice-top"></p>
                 <p id="disclaimerTerm1"></p>
                 <p id="disclaimerTerm2"></p>
                 <p id="disclaimerTerm3"></p>
                 <p id="disclaimerTerm4"></p>
                 <p id="disclaimerTerm5"></p>
-                <!-- MODIFIED: Removed the old P tag for scrollNotice that was at the bottom -->
+                
             </div>
             <div class="disclaimer-checkbox-area">
                 <input type="checkbox" id="disclaimerCheckbox" disabled>
@@ -497,20 +497,20 @@
 
         const inputText = document.getElementById('inputText');
         const outputText = document.getElementById('outputText');
-        const toneSelect = document.getElementById('toneSelect'); // Will be made active
+        const toneSelect = document.getElementById('toneSelect'); 
         const convertBtn = document.getElementById('convertBtn');
         const convertBtnText = convertBtn.querySelector('.button-text');
         const loader = document.getElementById('loader');
         const langEnBtn = document.getElementById('langEn');
         const langZhBtn = document.getElementById('langZh');
-        const copyOutputBtn = document.getElementById('copyOutputBtn'); // MODIFIED: Using ID
+        const copyOutputBtn = document.getElementById('copyOutputBtn'); 
         const mainTitleSpan = document.querySelector('#mainTitle .title-text');
         const subTitle = document.getElementById('subTitle');
         const modeToggleBtn = document.getElementById('modeToggleBtn');
         const modeEmoji = document.getElementById('modeEmoji');
         const documentTitle = document.querySelector('head title');
         const toneSelectLabel = document.querySelector('label[for="toneSelect"]');
-        const microphoneBtn = document.getElementById('microphoneBtn'); // MODIFIED: Using ID
+        const microphoneBtn = document.getElementById('microphoneBtn'); 
         
         const helpBtn = document.getElementById('helpBtn');
         const helpModal = document.getElementById('helpModal');
@@ -543,12 +543,12 @@
         const DISCLAIMER_ACCEPTED_KEY = 'disclaimerAccepted_v1.0';
         const PREFERRED_LANGUAGE_KEY = 'preferredLanguage_v1.0';
 
-        // MODIFIED: Variables for dynamic input length
+        
         let CURRENT_MAX_INPUT_LENGTH; 
         const MAX_INPUT_LENGTH_ZH = 200;
         const MAX_INPUT_LENGTH_EN = 1000;
 
-        // MODIFIED: Expanded injection keywords
+        
         const INJECTION_KEYWORDS = [
             'ignore previous instructions', 'ignore all previous instructions', 'ignore above', 'disregard all previous instructions', 'disregard previous context',
             'forget everything before this point', 'forget all prior directives',
@@ -572,7 +572,7 @@
             '重复以下', '重複以下', '说这些词', '說這些詞'
         ];
 
-        // --- MODIFIED: uiTexts object is now complete ---
+        
         const uiTexts = {
             friendly: {
                 title: { en: "Friendly Tone Converter", zh: "語氣友好轉換器" },
@@ -631,7 +631,7 @@
                 copyFailed: { en: "Failed to copy.", zh: "複製失敗。" }
             }
         };
-        // --- END OF MODIFIED uiTexts ---
+        
 
 
         function detectInputLanguage(text) {
@@ -643,21 +643,21 @@
             return 'en';
         }
         
-        // MODIFIED: sanitizeInput for improved keyword checking
+        
         function sanitizeInput(text) {
             if (text.length > CURRENT_MAX_INPUT_LENGTH) {
                 alert(uiTexts.common.inputTooLong[currentLanguage].replace('{maxLength}', CURRENT_MAX_INPUT_LENGTH));
                 return null; 
             }
-            const preprocessedText = text.toLowerCase().replace(/\s+/g, '').replace(/[._*#\-]/g, ''); // Added more chars to strip for check
+            const preprocessedText = text.toLowerCase().replace(/\s+/g, '').replace(/[._*#\-]/g, ''); 
             for (const keyword of INJECTION_KEYWORDS) {
                 const processedKeyword = keyword.toLowerCase().replace(/\s+/g, '').replace(/[._*#\-]/g, '');
-                if (processedKeyword && preprocessedText.includes(processedKeyword)) { // Ensure processedKeyword is not empty
+                if (processedKeyword && preprocessedText.includes(processedKeyword)) { 
                     alert(uiTexts.common.inputSuspicious[currentLanguage]);
                     return null;
                 }
             }
-            return text.replace(/</g, "<").replace(/>/g, ">"); // More standard sanitization for < >
+            return text.replace(/</g, "<").replace(/>/g, ">"); 
         }
 
 
@@ -687,7 +687,7 @@
             return `${coreInstruction}\n\n待改寫的文本:\n"${text}"`;
         }
         
-        // MODIFIED: Function to update input textarea's maxlength (placeholder handled in updateUI)
+        
         function updateInputRestrictions() {
             if (currentLanguage === 'zh') {
                 CURRENT_MAX_INPUT_LENGTH = MAX_INPUT_LENGTH_ZH;
@@ -697,18 +697,18 @@
             inputText.maxLength = CURRENT_MAX_INPUT_LENGTH;
         }
 
-        // MODIFIED: Function to set the application mode (friendly/unfriendly) and update UI
+        
         function setAppMode(newModeIsFriendly) {
             isFriendlyMode = newModeIsFriendly;
-            // toneSelect.value is updated within updateUI based on isFriendlyMode
-            updateUI(); // Update all UI elements based on the new mode
+            
+            updateUI(); 
         }
 
         function setLanguage(lang) {
             currentLanguage = lang;
             localStorage.setItem(PREFERRED_LANGUAGE_KEY, lang);
-            updateInputRestrictions(); // Update length limits first
-            updateUI(); // Then update the entire UI
+            updateInputRestrictions(); 
+            updateUI(); 
         }
 
         function updateUI() {
@@ -720,13 +720,13 @@
             mainTitleSpan.textContent = uiTexts[modeKey].title[lang];
             subTitle.textContent = uiTexts[modeKey].subtitle[lang];
 
-            // Sync toneSelect with isFriendlyMode
+            
             toneSelect.value = modeKey; 
             toneSelect.querySelector('option[value="friendly"]').textContent = uiTexts.friendly.selectOption[lang];
             toneSelect.querySelector('option[value="unfriendly"]').textContent = uiTexts.unfriendly.selectOption[lang];
 
             modeEmoji.textContent = uiTexts[modeKey].emoji;
-            toneSelectLabel.textContent = uiTexts[modeKey].toneSelectLabel[lang]; // Original label was for the disabled select
+            toneSelectLabel.textContent = uiTexts[modeKey].toneSelectLabel[lang]; 
             
             if (convertBtnText) {
                  convertBtnText.textContent = uiTexts[modeKey].convertButton[lang];
@@ -736,8 +736,8 @@
             document.querySelectorAll('[data-en][data-zh]').forEach(element => {
                 if (element.closest('#mainTitle') || element.closest('#subTitle') || 
                     element.id === 'toneSelectLabel' || element.id === 'convertBtn' || 
-                    element.parentElement === loader || element.tagName === 'OPTION' || /* exclude options from here */
-                    element.id === 'disclaimerScrollNotice' /* handled separately */ ) { 
+                    element.parentElement === loader || element.tagName === 'OPTION' || 
+                    element.id === 'disclaimerScrollNotice'  ) { 
                     return;
                 }
                 const text = element.getAttribute(`data-${lang}`);
@@ -747,14 +747,14 @@
             });
             helpBtn.textContent = helpBtn.getAttribute(`data-${lang}`);
             
-            // MODIFIED: Set placeholder text from data attributes (no length limit here)
+            
             inputText.placeholder = inputText.getAttribute(`data-${lang}-placeholder`) || (lang === 'zh' ? "請在此輸入您的文字..." : "Enter your text here...");
             outputText.placeholder = uiTexts[modeKey].placeholder[lang];
 
 
-            // MODIFIED: Update disclaimer scroll notice text specifically
+            
             disclaimerScrollNotice.textContent = uiTexts.disclaimerModal.scrollNotice[lang];
-            // Continue with other modal texts
+            
             helpModalTitle.textContent = uiTexts.helpModal.title[lang];
             helpModalContent.textContent = uiTexts.helpModal.content[lang];
             helpModalCloseBtn.textContent = uiTexts.helpModal.closeButton[lang];
@@ -779,7 +779,7 @@
             } else {
                 langZhBtn.classList.add('active');
             }
-            updateInputRestrictions(); // Call again to ensure maxLength is correct after lang change
+            updateInputRestrictions(); 
         }
         
         function showModal(modalElement) { modalElement.classList.add('active');}
@@ -797,17 +797,17 @@
         langEnBtn.addEventListener('click', () => setLanguage('en'));
         langZhBtn.addEventListener('click', () => setLanguage('zh'));
 
-        // MODIFIED: Event listener for toneSelect dropdown to change mode
+        
         toneSelect.addEventListener('change', (event) => {
             setAppMode(event.target.value === 'friendly');
         });
 
-        // MODIFIED: modeToggleBtn now also calls setAppMode to sync
+        
         modeToggleBtn.addEventListener('click', () => {
-            setAppMode(!isFriendlyMode); // Toggle the current mode
+            setAppMode(!isFriendlyMode); 
         });
         
-        // MODIFIED: showLoader now disables/enables more UI controls
+        
         function showLoader(show) {
             const elementsToDisable = [
                 convertBtn, langEnBtn, langZhBtn, modeToggleBtn, toneSelect,
@@ -843,7 +843,7 @@
                 const prompt = generatePrompt(sanitizedText, inputLanguage, isFriendlyMode ? 'friendly' : 'unfriendly');
                 console.log("Generated Prompt for " + (isFriendlyMode ? "friendly" : "unfriendly") + " mode (UI lang: " + currentLanguage + ", Input lang: " + inputLanguage + "):", prompt);
                 
-                // MODIFIED: Added generationConfig with maxOutputTokens
+                
                 const requestBody = {
                     contents: [{ parts: [{ text: prompt }] }],
                     generationConfig: {
@@ -901,7 +901,7 @@
                 }
                 if (rewrittenText) {
                     let finalOutputText = rewrittenText.trim();
-                    // MODIFIED: Add truncation notice if MAX_TOKENS is the reason
+                    
                     if (finishReason === "MAX_TOKENS") {
                         const truncationNotice = currentLanguage === 'zh' ? "\n(內容可能因長度限制被截斷)" : "\n(Content may be truncated due to length limits)";
                         finalOutputText += truncationNotice;
@@ -942,10 +942,10 @@
             const savedLang = localStorage.getItem(PREFERRED_LANGUAGE_KEY);
             const browserLang = navigator.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
             
-            // MODIFIED: Initialize isFriendlyMode based on the default select value
+            
             isFriendlyMode = toneSelect.value === 'friendly'; 
             
-            setLanguage(savedLang || browserLang); // This calls updateUI which syncs everything
+            setLanguage(savedLang || browserLang); 
         });
     </script>
 </body>
